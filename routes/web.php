@@ -27,6 +27,7 @@ Route::get('/fetchall', [TaskController::class, 'fetchAll'])->name('fetchAll');
 Route::delete('/delete/{id}', [TaskController::class, 'delete'])->name('delete');
 Route::get('/edit', [TaskController::class, 'edit'])->name('edit');
 Route::post('/update', [TaskController::class, 'update'])->name('update');
+Route::get('/show-all', [TaskController::class, 'showAll'])->name('showAll');
 
 });
 Route::middleware([

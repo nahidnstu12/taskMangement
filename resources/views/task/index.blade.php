@@ -18,10 +18,12 @@
                 <div class="col">
                   <div class="input-group mb-3">
                       <div class="input-group-prepend">
+                        @if($isAdmin)
                         <div class="input-group-text align-items-center " style="gap: 8px;">
                           <input type="checkbox" aria-label="Checkbox for following text input" id="showall">
                           <label for="showall">Show All</label>
                         </div>
+                        @endif
                       </div>
                       {{-- <input type="text" class="form-control" aria-label="Text input with checkbox"> --}}
                     </div>
