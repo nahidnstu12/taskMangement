@@ -29,8 +29,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/update', [TaskController::class, 'update'])->name('update');
     Route::get('/fetchall', [TaskController::class, 'fetchAll'])->name('fetchAll');
     Route::get('/show-all', [TaskController::class, 'showAll'])->name('showAll');
-    Route::get("/grid", [TaskController::class, "gridView"])->name("grid");
+    Route::get("/pagination/fetch_data", [TaskController::class, "showAll"]);
+    
 });
+
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

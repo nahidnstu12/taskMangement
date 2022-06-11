@@ -1,3 +1,34 @@
+//layout
+$(function () {
+
+    $(".listview").click(function () {
+        $(".card-view").removeClass("col-xl-3 col-sm-6");
+        // console.log("listview");
+        $(".card-view").addClass("col-12");
+        $(".img-thumbnail").removeClass("mx-auto");
+        $("#img-div").addClass("d-flex justify-content-between");
+
+    });
+
+    $(".gridview").click(function () {
+        $(".card-view").removeClass("col-12");
+        $("#img-div").removeClass("d-flex justify-content-between");
+        // console.log("listview");
+        $(".card-view").addClass("col-xl-3 col-sm-6");
+        $(".img-thumbnail").addClass("mx-auto");
+    });
+    /*  Add active class to the current button (highlight it) */
+    let container = document.getElementById("btnContainer");
+    let btns = container.getElementsByClassName("btn");
+    for (let i = 0; i < btns.length; i++) {
+        btns[i].addEventListener("click", function () {
+            let current = document.getElementsByClassName("active");
+            current[0].className = current[0].className.replace(" active", "");
+            this.className += " active";
+        });
+    }
+});
+
 $(function () {
     // add new task ajax request
     $("#add_task_form").submit(function (e) {
@@ -18,7 +49,7 @@ $(function () {
             processData: false,
             dataType: "json",
             success: function (response) {
-                console.log(response);
+                // console.log(response);
 
                 if (response.status == 200) {
                     Swal.fire("Added!", "Tasks Added Successfully!", "success");
@@ -123,7 +154,7 @@ $(function () {
                         // _token: csrf
                     },
                     success: function (response) {
-                        console.log(response);
+                        // console.log(response);
                         Swal.fire(
                             "Deleted!",
                             "Your file has been deleted.",
@@ -139,46 +170,17 @@ $(function () {
     $("#showall:checkbox").bind("change", function (e) {
         if ($(this).is(":checked")) {
             admin();
+            console.log("admin")
         } else {
+          console.log("user")
             fetchAllTasks();
         }
     });
 
-    $(".layout").click(function () {
-        var layout = $(this).data("layout");
-        // alert($(this).data("layout"));
-        let url = layout === "listview" ? "/fetchall" : "/grid";
-        if (layout === "listview") {
-            $.ajax({
-                url: "/fetchall",
-                method: "get",
-                success: function (response) {
-                    // console.log(response);
-
-                    $("#show_all_tasks").html(response);
-                    $("table").DataTable({
-                        order: [0, "desc"],
-                        paging: false,
-                        bPaginate: false,
-                    });
-                },
-            });
-        } else {
-            $.ajax({
-                url: "/grid",
-                method: "get",
-                success: function (response) {
-                    console.log(response);
-
-                    $("#show_all_tasks").html(response);
-                },
-            });
-        }
-    });
     
+
     // fetch all tasks ajax request
     fetchAllTasks();
-    
 
     function fetchAllTasks() {
         //   console.log("hell0");
@@ -190,11 +192,7 @@ $(function () {
                 // console.log(response);
 
                 $("#show_all_tasks").html(response);
-                $("table").DataTable({
-                    order: [0, "desc"],
-                    paging: false,
-                    bPaginate: false,
-                });
+                
             },
         });
     }
@@ -208,55 +206,29 @@ $(function () {
                 // console.log(response);
 
                 $("#show_all_tasks").html(response);
-                $("table").DataTable({
-                    order: [0, "desc"],
-                    paging: false,
-                    bPaginate: false,
-                });
+               
             },
         });
     }
     // grid view
 });
 
-// pagination
-$(window).on("hashchange", function () {
-    if (window.location.hash) {
-        var page = window.location.hash.replace("#", "");
-        if (page == Number.NaN || page <= 0) {
-            return false;
-        } else {
-            console.log("pagon");
-            getData(page);
-        }
-    }
-});
+/// pagiantion
+ $(document).ready(function () {
+     $(document).on("click", ".pagination a", function (event) {
+         event.preventDefault();
+         var page = $(this).attr("href").split("page=")[1];
 
-$(document).ready(function () {
-    $(document).on("click", ".pagination a", function (event) {
-        event.preventDefault();
+         fetch_data(page);
+     });
 
-        $("li").removeClass("active");
-        $(this).parent("li").addClass("active");
-
-        var myurl = $(this).attr("href");
-        var page = $(this).attr("href").split("page=")[1];
-
-        getData(page);
-    });
-});
-
-function getData(page) {
-    $.ajax({
-        url: "?page=" + page,
-        type: "get",
-        datatype: "html",
-    })
-        .done(function (data) {
-            $("#show_all_tasks").empty().html(data);
-            location.hash = page;
-        })
-        .fail(function (jqXHR, ajaxOptions, thrownError) {
-            alert("No response from server");
-        });
-}
+     function fetch_data(page) {
+         $.ajax({
+             url: "/pagination/fetch_data?page=" + page,
+             success: function (data) {
+                 // console.log(data)
+                 $("#show_all_tasks").html(data);
+             },
+         });
+     }
+ });

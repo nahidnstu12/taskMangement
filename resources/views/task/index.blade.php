@@ -20,7 +20,7 @@
                   <div class="input-group-prepend">
                     @if($isAdmin)
                     <div class="input-group-text align-items-center " style="gap: 8px;">
-                      <input type="checkbox" aria-label="Checkbox for following text input" id="showall">
+                      <input type="checkbox" aria-label="Checkbox for following text input" id="showall" name="show" >
                       <label for="showall">Show All</label>
                     </div>
                     @endif
@@ -28,10 +28,10 @@
                   {{-- <input type="text" class="form-control" aria-label="Text input with checkbox"> --}}
                 </div>
               </div>
-              <div class="col">
+              <div class="col d-flex justify-content-end">
                <div id="btnContainer">
-                <button class="btn" onclick="listView()"><i class="fa fa-bars"></i> List</button>
-                <button class="btn active" onclick="gridView()"><i class="fa fa-th-large"></i> Grid</button>
+                <div class="btn listview active" ><i class="fa fa-bars"></i> List</div>
+                <div class="btn  gridview" ><i class="fa fa-th-large"></i> Grid</div>
               </div>
               </div>
             </div>
@@ -40,7 +40,7 @@
         <div class="card-body" id="show_all_tasks">
           @if ($tasks->count() < 0) <h1 class="text-center text-secondary my-5">Loading...</h1>
             @else
-            @include('task.grid')
+            @include('task.layout')
             @endif
 
 
@@ -68,11 +68,11 @@
         <div class="modal-body p-4 bg-light">
           {{-- <input type="hidden" name="userid" class="form-control" value="{{Auth::id()}}"> --}}
           <div class="row">
-            <div class="col-lg">
+            <div class="col-12">
               <label for="tasktitle">Task Title</label>
               <input type="text" name="tasktitle" class="form-control" placeholder="Task Titile" required>
             </div>
-            <div class="col-lg">
+            <div class="col-12">
               <label for="description">Description</label>
               <input type="text" name="description" class="form-control" placeholder="Description" required>
             </div>
@@ -109,11 +109,11 @@
         <input type="hidden" name="task_image" id="task_image">
         <div class="modal-body p-4 bg-light">
           <div class="row">
-            <div class="col-lg">
+            <div class="col-12">
               <label for="tasktitle">Task Title</label>
               <input type="text" name="tasktitle" id="tasktitle" class="form-control" placeholder="First Name" required>
             </div>
-            <div class="col-lg">
+            <div class="col-12">
               <label for="description">Description</label>
               <input type="text" name="description" id="description" class="form-control" placeholder="Description"
                 required>
@@ -141,3 +141,4 @@
 
 
 @endsection
+

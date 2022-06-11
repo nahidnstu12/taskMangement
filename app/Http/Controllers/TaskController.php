@@ -14,110 +14,37 @@ class TaskController extends Controller
 	{
 		$isAdmin = Auth::user()->role === "1";
 		// dd($isAdmin);
-			$tasks = Auth::user()
-			->tasks()
-			->orderByDesc('created_at')
-			->paginate(5);
-		// return view("task.index")->with("tasks",$tasks);
-		return view("task.index", compact("tasks", "isAdmin"));
-	}
-	public function gridView()
-	{
-		$isAdmin = Auth::user()->role === "1";
-		// dd($isAdmin);
 		$tasks = Auth::user()
 			->tasks()
 			->orderByDesc('created_at')
-			->paginate(5);
+			->paginate(2);
 		// return view("task.index")->with("tasks",$tasks);
 		return view("task.index", compact("tasks", "isAdmin"));
 	}
+
+	// admin view
 	public function showAll(Request $request)
 	{
+	
+		
 		$tasks = Task::paginate(2);
 
 		if ($request->ajax()) {
-			return view("task.fetchAll", compact("tasks"));
+			return view("task.layout", compact("tasks"))->render();
 		}
 		return view("task.index", compact("tasks"));
-		// $output = '';
-		// if ($tasks->count() > 0) {
-		// 	$output .= '<table class="table table-striped table-sm text-center align-middle">
-        //     <thead>
-        //       <tr>
-        //         <th>ID</th>
-        //         <th>Image</th>
-        //         <th>Task Name</th>
-        //         <th>Description</th>
-        //         <th>Action</th>
-        //       </tr>
-        //     </thead>
-        //     <tbody>';
-		// 	foreach ($tasks as $task) {
-		// 		$imageUrl = $task->image ?? "dummy.png";
-		// 		$output .= '<tr>
-        //         <td>' . $task->id . '</td>
-        //         <td><img src="storage/images/' . $imageUrl . '" width="50" class="img-thumbnail rounded-circle"></td>
-        //         <td>' . $task->tasktitle . '</td>
-		// 		<td> ' . $task->description . '</td>
-               
-        //         <td>
-        //           <a href="#" id="' . $task->id . '" class="text-success mx-1 editIcon" data-toggle="modal" data-target="#editTaskModal"><i class="fas fa-marker"></i></a>
-
-        //           <a href="#" id="' . $task->id . '" class="text-danger mx-1 deleteIcon"><i class="fas fa-trash"></i></a>
-        //         </td>
-        //       </tr>';
-		// 	}
-		// 	$output .= '</tbody></table>';
-		// 	echo $output;
-		// } else {
-		// 	echo '<h1 class="text-center text-secondary my-5">No record present in the database!</h1>';
-		// }
 	}
-	// handle fetch all eamployees ajax request
+	// user created lists view
 	public function fetchAll(Request $request)
 	{
 		$tasks = Auth::user()
 			->tasks()
 			->orderByDesc('created_at')
-			->paginate(5);
-		if($request->ajax()){
-			return view("task.fetchAll", compact("tasks"));
+			->paginate(2);
+		if ($request->ajax()) {
+			return view("task.layout", compact("tasks"))->render();
 		}
 		return view("task.index", compact("tasks"));
-		// $output = '';
-		// if ($tasks->count() > 0) {
-		// 	$output .= '<table class="table table-striped table-sm text-center align-middle">
-        //     <thead>
-        //       <tr>
-        //         <th>ID</th>
-        //         <th>Image</th>
-        //         <th>Task Name</th>
-        //         <th>Description</th>
-        //         <th>Action</th>
-        //       </tr>
-        //     </thead>
-        //     <tbody>';
-		// 	foreach ($tasks as $task) {
-		// 		$imageUrl = $task->image ?? "dummy.png";
-		// 		$output .= '<tr>
-        //         <td>' . $task->id . '</td>
-        //         <td><img src="storage/images/' . $imageUrl . '" width="50" class="img-thumbnail rounded-circle"></td>
-        //         <td>' . $task->tasktitle . '</td>
-		// 		<td> ' . $task->description . '</td>
-               
-        //         <td>
-        //           <a href="#" id="' . $task->id . '" class="text-success mx-1 editIcon" data-toggle="modal" data-target="#editTaskModal"><i class="fas fa-marker"></i></a>
-
-        //           <a href="#" id="' . $task->id . '" class="text-danger mx-1 deleteIcon"><i class="fas fa-trash"></i></a>
-        //         </td>
-        //       </tr>';
-		// 	}
-		// 	$output .= '</tbody></table>';
-		// 	echo $output;
-		// } else {
-		// 	echo '<h1 class="text-center text-secondary my-5">No record present in the database!</h1>';
-		// }
 	}
 
 	// handle insert a new taskloyee ajax request

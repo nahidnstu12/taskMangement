@@ -22,7 +22,7 @@
 </head>
 
 <body style="">
-  <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #e3f2fd;">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between" style="background-color: #e3f2fd;">
     <a class="navbar-brand" href="#">Home</a>
     {{-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,10 +37,10 @@
 
         @else
         <li class="nav-item">
-          <a class="nav-link" href="{{ route("login") }}">Login</a>
+          <a class="nav-link" href="{{ route(" login") }}">Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route("register") }}">Register</a>
+          <a class="nav-link" href="{{ route(" register") }}">Register</a>
         </li>
         @endauth
         @endif
@@ -69,6 +69,9 @@
   <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src={{ asset('js/main.js') }}></script>
   {{-- <script src={{ asset('js/main2.js') }}></script> --}}
+  <script>
+   
+  </script>
 </body>
 
 </html>
