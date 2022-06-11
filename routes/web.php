@@ -20,15 +20,16 @@ use App\Http\Controllers\TaskController;
 
 
 
-Route::middleware(['auth'])->group(function() {
+Route::middleware(['auth'])->group(function () {
     Route::get("/", [TaskController::class, "index"])->name("index");
-Route::post('/store', [TaskController::class, 'store'])->name('store');
-Route::get('/fetchall', [TaskController::class, 'fetchAll'])->name('fetchAll');
-Route::delete('/delete/{id}', [TaskController::class, 'delete'])->name('delete');
-Route::get('/edit', [TaskController::class, 'edit'])->name('edit');
-Route::post('/update', [TaskController::class, 'update'])->name('update');
-Route::get('/show-all', [TaskController::class, 'showAll'])->name('showAll');
 
+    Route::post('/store', [TaskController::class, 'store'])->name('store');
+    Route::delete('/delete/{id}', [TaskController::class, 'delete'])->name('delete');
+    Route::get('/edit', [TaskController::class, 'edit'])->name('edit');
+    Route::post('/update', [TaskController::class, 'update'])->name('update');
+    Route::get('/fetchall', [TaskController::class, 'fetchAll'])->name('fetchAll');
+    Route::get('/show-all', [TaskController::class, 'showAll'])->name('showAll');
+    Route::get("/grid", [TaskController::class, "gridView"])->name("grid");
 });
 Route::middleware([
     'auth:sanctum',

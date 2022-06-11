@@ -138,13 +138,47 @@ $(function () {
     //
     $("#showall:checkbox").bind("change", function (e) {
         if ($(this).is(":checked")) {
-           admin()
+            admin();
         } else {
-            fetchAllTasks()
+            fetchAllTasks();
         }
     });
+
+    $(".layout").click(function () {
+        var layout = $(this).data("layout");
+        // alert($(this).data("layout"));
+        let url = layout === "listview" ? "/fetchall" : "/grid";
+        if (layout === "listview") {
+            $.ajax({
+                url: "/fetchall",
+                method: "get",
+                success: function (response) {
+                    // console.log(response);
+
+                    $("#show_all_tasks").html(response);
+                    $("table").DataTable({
+                        order: [0, "desc"],
+                        paging: false,
+                        bPaginate: false,
+                    });
+                },
+            });
+        } else {
+            $.ajax({
+                url: "/grid",
+                method: "get",
+                success: function (response) {
+                    console.log(response);
+
+                    $("#show_all_tasks").html(response);
+                },
+            });
+        }
+    });
+    
     // fetch all tasks ajax request
     fetchAllTasks();
+    
 
     function fetchAllTasks() {
         //   console.log("hell0");
@@ -159,13 +193,14 @@ $(function () {
                 $("table").DataTable({
                     order: [0, "desc"],
                     paging: false,
+                    bPaginate: false,
                 });
             },
         });
     }
     function admin() {
         //   console.log("hell0");
-
+        // $("#DataTables_Table_0_info").hide();
         $.ajax({
             url: "/show-all",
             method: "get",
@@ -176,8 +211,52 @@ $(function () {
                 $("table").DataTable({
                     order: [0, "desc"],
                     paging: false,
+                    bPaginate: false,
                 });
             },
         });
     }
+    // grid view
 });
+
+// pagination
+$(window).on("hashchange", function () {
+    if (window.location.hash) {
+        var page = window.location.hash.replace("#", "");
+        if (page == Number.NaN || page <= 0) {
+            return false;
+        } else {
+            console.log("pagon");
+            getData(page);
+        }
+    }
+});
+
+$(document).ready(function () {
+    $(document).on("click", ".pagination a", function (event) {
+        event.preventDefault();
+
+        $("li").removeClass("active");
+        $(this).parent("li").addClass("active");
+
+        var myurl = $(this).attr("href");
+        var page = $(this).attr("href").split("page=")[1];
+
+        getData(page);
+    });
+});
+
+function getData(page) {
+    $.ajax({
+        url: "?page=" + page,
+        type: "get",
+        datatype: "html",
+    })
+        .done(function (data) {
+            $("#show_all_tasks").empty().html(data);
+            location.hash = page;
+        })
+        .fail(function (jqXHR, ajaxOptions, thrownError) {
+            alert("No response from server");
+        });
+}
