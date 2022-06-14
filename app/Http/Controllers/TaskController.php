@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Response;
 
 class TaskController extends Controller
 {
@@ -21,41 +22,46 @@ class TaskController extends Controller
 		// return view("task.index")->with("tasks",$tasks);
 		return view("task.index", compact("tasks", "isAdmin"));
 	}
-
-	// admin view
+// use it fetch data
 	public function showAll(Request $request)
 	{
 	
 		// dd($request->all());
+		$userid = Auth::user()->id;
+		// $username = Auth::user()->name;
 		
-		if($request->check){
+		if($request->check == 'true'){
+			
+			// admin view
 			$tasks = Task::paginate(2);
-			// return response()->json($tasks);
+			// $username = $tasks->user->name;
+			// return response()->json(['tasks' => $tasks, "msg"=>"all data"]);
 		}else{
+			//user specific tasks
 			$tasks = Auth::user()
 			->tasks()
 			->orderByDesc('created_at')
 			->paginate(2);
-			// return response()->json($tasks);
+			// return response()->json(['tasks' => $tasks, "msg"=>"userdata"]);
 		}
 
 		if ($request->ajax()) {
-			return view("task.layout", compact("tasks"))->render();
+			 return Response::json(['tasks' => $tasks, "userid"=>$userid], 200);
 		}
-		return view("task.index", compact("tasks"));
+		return Response::json('Tasks not found!', 400);
 	}
 	// user created lists view
-	public function fetchAll(Request $request)
-	{
-		$tasks = Auth::user()
-			->tasks()
-			->orderByDesc('created_at')
-			->paginate(2);
-		if ($request->ajax()) {
-			return view("task.layout", compact("tasks"))->render();
-		}
-		return view("task.index", compact("tasks"));
-	}
+	// public function fetchAll(Request $request)
+	// {
+	// 	$tasks = Auth::user()
+	// 		->tasks()
+	// 		->orderByDesc('created_at')
+	// 		->paginate(2);
+	// 	if ($request->ajax()) {
+	// 		return view("task.layout", compact("tasks"))->render();
+	// 	}
+	// 	return view("task.index", compact("tasks"));
+	// }
 
 	// handle insert a new taskloyee ajax request
 	public function store(Request $request)

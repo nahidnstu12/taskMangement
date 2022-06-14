@@ -1,13 +1,11 @@
 //layout
 $(function () {
-
     $(".listview").click(function () {
         $(".card-view").removeClass("col-xl-3 col-sm-6");
         // console.log("listview");
         $(".card-view").addClass("col-12");
         $(".img-thumbnail").removeClass("mx-auto");
         $("#img-div").addClass("d-flex justify-content-between");
-
     });
 
     $(".gridview").click(function () {
@@ -53,7 +51,7 @@ $(function () {
 
                 if (response.status == 200) {
                     Swal.fire("Added!", "Tasks Added Successfully!", "success");
-                    fetchAllTasks();
+                    fetchTasks();
                 }
                 $("#add_task_btn").text("Add Tasks");
                 $("#add_task_form")[0].reset();
@@ -117,7 +115,7 @@ $(function () {
                         "Tasks Updated Successfully!",
                         "success"
                     );
-                    fetchAllTasks();
+                    fetchTasks();
                 }
                 $("#edit_task_btn").text("Update Tasks");
                 $("#edit_task_form")[0].reset();
@@ -160,7 +158,7 @@ $(function () {
                             "Your file has been deleted.",
                             "success"
                         );
-                        fetchAllTasks();
+                        fetchTasks();
                     },
                 });
             }
@@ -169,36 +167,31 @@ $(function () {
     //
     $("#showall:checkbox").bind("change", function (e) {
         if ($(this).is(":checked")) {
-            admin();
-            console.log("admin")
+            fetchTasks();
+            console.log("admin");
         } else {
-          console.log("user")
-            fetchAllTasks();
+            console.log("user");
+            fetchTasks();
         }
     });
 
-    
-
     // fetch all tasks ajax request
-    fetchAllTasks();
+    fetchTasks();
 
-    function fetchAllTasks() {
-        //   console.log("hell0");
+    // function fetchTasks() {
+    //     //   console.log("hell0");
 
-        $.ajax({
-            url: "/fetchall",
-            method: "get",
-            success: function (response) {
-                // console.log(response);
+    //     $.ajax({
+    //         url: "/fetchall",
+    //         method: "get",
+    //         success: function (response) {
+    //             // console.log(response);
 
-                $("#show_all_tasks").html(response);
-                
-            },
-        });
-    }
-    function admin() {
-        //   console.log("hell0");
-        // $("#DataTables_Table_0_info").hide();
+    //             $("#show_all_tasks").html(response);
+    //         },
+    //     });
+    // }
+    function fetchTasks() {
         $.ajaxSetup({
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -207,12 +200,60 @@ $(function () {
         $.ajax({
             url: "/show-all",
             method: "post",
-            data: {check:$('input[name="show"]').prop('checked')},
+            data: { check: $('input[name="show"]').prop("checked") },
             success: function (response) {
-                console.log(response);
+                var resultData = response.tasks.data;
+                var bodyData = `<div class="container">
+                <div class="row text-center">`;
+                // $("#show_all_tasks .name").html(response);
+                console.log({
+                    tasks: response.tasks.data,
+                    id: response.username,
+                });
 
-                $("#show_all_tasks").html(response);
-               
+                $.each(resultData, function (index, task) {
+                    let adminAction = task.user_id !== response.userid;
+
+                    bodyData += `
+                    <div class="col-12 mb-5 card-view" style="box-shadow: 0 3px 10px rgb(0 0 0 / 0.2); ">
+                        <div class="bg-white rounded shadow-sm py-5 px-4 d-flex justify-content-between" id="img-div">
+                            <img src="storage/images/${
+                                task.image
+                            }" alt="" width="150" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm"/>
+                            <div class="text-center">
+                                <h5 class="mb-0">${task.tasktitle}</h5>
+                                <span class="small text-uppercase text-muted">ID: ${
+                                    response.userid
+                                }</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-between">
+                        <p class="mt-3" style="text-align: justify; max-width:85%;">${
+                            task.description
+                        }</p>
+                        <div class="d-flex align-items-center px-2">
+                            <a href="#" id="${
+                                task.id
+                            }" class="text-success mx-1 editIcon ${
+                        adminAction ? " disabled" : ""
+                    }" onmouseover="${adminAction} &&    alert('you haven\'t permission')" data-toggle="modal" data-target="#editTaskModal"><i class="fas fa-marker"></i>
+                            </a>
+
+                            <a href="#" id="${
+                                task.id
+                            }" class="text-danger mx-1 deleteIcon ${
+                        adminAction ? " disabled" : ""
+                    }" onmouseover="${adminAction} && alert('you haven\'t permission')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                    </div>
+                    `;
+                });
+                bodyData += `</div></div>`;
+
+                $("#show_all_tasks").append(bodyData);
             },
         });
     }
@@ -220,21 +261,21 @@ $(function () {
 });
 
 /// pagiantion
- $(document).ready(function () {
-     $(document).on("click", ".pagination a", function (event) {
-         event.preventDefault();
-         var page = $(this).attr("href").split("page=")[1];
+$(document).ready(function () {
+    $(document).on("click", ".pagination a", function (event) {
+        event.preventDefault();
+        var page = $(this).attr("href").split("page=")[1];
 
-         fetch_data(page);
-     });
+        fetch_data(page);
+    });
 
-     function fetch_data(page) {
-         $.ajax({
-             url: "/pagination/fetch_data?page=" + page,
-             success: function (data) {
-                 // console.log(data)
-                 $("#show_all_tasks").html(data);
-             },
-         });
-     }
- });
+    function fetch_data(page) {
+        $.ajax({
+            url: "show-all?page=" + page,
+            success: function (data) {
+                console.log(data.data)
+                $("#show_all_tasks").html(data.data);
+            },
+        });
+    }
+});

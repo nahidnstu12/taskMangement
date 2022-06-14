@@ -39,17 +39,17 @@
           </form>
         </div>
         <div class="card-body" id="show_all_tasks">
-          @if ($tasks->count() < 0) <h1 class="text-center text-secondary my-5">Loading...</h1>
+          {{-- @if ($tasks->count() < 0) <h1 class="text-center text-secondary my-5">Loading...</h1>
             @else
             @include('task.layout')
-            @endif
+            @endif --}}
 
 
         </div>
       </div>
 
     </div>
-    {{-- {{ $tasks->links() }} --}}
+    {{ $tasks->links() }}
   </div>
 </div>
 {{-- main content end --}}
