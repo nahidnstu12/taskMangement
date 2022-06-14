@@ -45,7 +45,7 @@
     color: white;
 }
 
-.editIcon.disabled, .deleteIcon.editIcon.disabled {
+.editIcon.disabled, .deleteIcon.disabled {
     pointer-events: none;
     cursor: default;
 }

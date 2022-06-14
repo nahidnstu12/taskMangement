@@ -24,7 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get("/", [TaskController::class, "index"])->name("index");
 
     Route::post('/store', [TaskController::class, 'store'])->name('store');
-    Route::delete('/delete/{id}', [TaskController::class, 'delete'])->name('delete');
+    Route::delete('/delete', [TaskController::class, 'delete'])->name('delete');
     Route::get('/edit', [TaskController::class, 'edit'])->name('edit');
     Route::post('/update', [TaskController::class, 'update'])->name('update');
     // Route::get('/fetchall', [TaskController::class, 'fetchAll'])->name('fetchAll');

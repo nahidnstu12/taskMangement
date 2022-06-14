@@ -18,7 +18,7 @@ class TaskController extends Controller
 		$tasks = Auth::user()
 			->tasks()
 			->orderByDesc('created_at')
-			->paginate(2);
+			->paginate(4);
 		// return view("task.index")->with("tasks",$tasks);
 		return view("task.index", compact("tasks", "isAdmin"));
 	}
@@ -33,15 +33,15 @@ class TaskController extends Controller
 		if($request->check == 'true'){
 			
 			// admin view
-			$tasks = Task::paginate(2);
-			// $username = $tasks->user->name;
+			$tasks = Task::paginate(4);
+			
 			// return response()->json(['tasks' => $tasks, "msg"=>"all data"]);
 		}else{
 			//user specific tasks
 			$tasks = Auth::user()
 			->tasks()
 			->orderByDesc('created_at')
-			->paginate(2);
+			->paginate(4);
 			// return response()->json(['tasks' => $tasks, "msg"=>"userdata"]);
 		}
 
@@ -50,18 +50,7 @@ class TaskController extends Controller
 		}
 		return Response::json('Tasks not found!', 400);
 	}
-	// user created lists view
-	// public function fetchAll(Request $request)
-	// {
-	// 	$tasks = Auth::user()
-	// 		->tasks()
-	// 		->orderByDesc('created_at')
-	// 		->paginate(2);
-	// 	if ($request->ajax()) {
-	// 		return view("task.layout", compact("tasks"))->render();
-	// 	}
-	// 	return view("task.index", compact("tasks"));
-	// }
+
 
 	// handle insert a new taskloyee ajax request
 	public function store(Request $request)
@@ -105,6 +94,7 @@ class TaskController extends Controller
 		// $this->authorize('complete', $task);
 		$fileName = '';
 		$task = Task::find($request->task_id);
+		// dd($request->hasFile('image'));
 		if ($request->hasFile('image')) {
 			$file = $request->file('image');
 			$fileName = time() . '.' . $file->getClientOriginalExtension();
@@ -112,12 +102,13 @@ class TaskController extends Controller
 			if ($task->image) {
 				Storage::delete('public/images/' . $task->image);
 			}
-		} else {
-			$fileName = $request->task_image;
+		} 
+		else {
+			$fileName = $task->image;
 		}
 
 		$taskData = ['tasktitle' => $request->tasktitle, 'description' => $request->description, 'image' => $fileName];
-
+// dd($task->image);
 		$task->update($taskData);
 		return response()->json([
 			'status' => 200,
@@ -128,7 +119,7 @@ class TaskController extends Controller
 	public function delete(Task $task, Request $request)
 	{
 		// dd($task->id);
-		$this->authorize('deleteTask', $task);
+		// $this->authorize('deleteTask', $task);
 		$id = $request->id;
 
 		$task = Task::find($id);

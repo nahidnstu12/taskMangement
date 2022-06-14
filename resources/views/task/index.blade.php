@@ -49,7 +49,9 @@
       </div>
 
     </div>
-    {{ $tasks->links() }}
+    <div class="pagination justify-content-end align-items-center m-auto">
+      
+  </div>
   </div>
 </div>
 {{-- main content end --}}

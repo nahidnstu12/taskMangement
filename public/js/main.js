@@ -1,19 +1,23 @@
 //layout
+let activelayout = $('.active').attr('class').split(" ").includes("listview")
+let activeClass = "listview"
 $(function () {
-    $(".listview").click(function () {
+    $(document).on("click", ".listview", function (event) {
         $(".card-view").removeClass("col-xl-3 col-sm-6");
         // console.log("listview");
         $(".card-view").addClass("col-12");
         $(".img-thumbnail").removeClass("mx-auto");
         $("#img-div").addClass("d-flex justify-content-between");
+        activeClass = "listview"
     });
 
-    $(".gridview").click(function () {
+    $(document).on("click", ".gridview", function (event) {
         $(".card-view").removeClass("col-12");
         $("#img-div").removeClass("d-flex justify-content-between");
         // console.log("listview");
         $(".card-view").addClass("col-xl-3 col-sm-6");
         $(".img-thumbnail").addClass("mx-auto");
+        activeClass = "gridview"
     });
     /*  Add active class to the current button (highlight it) */
     let container = document.getElementById("btnContainer");
@@ -27,7 +31,7 @@ $(function () {
     }
 });
 
-$(function () {
+$(document).ready(function () {
     // add new task ajax request
     $("#add_task_form").submit(function (e) {
         $.ajaxSetup({
@@ -78,14 +82,17 @@ $(function () {
                 // _token: "<?php csrf_token() ?>"
             },
             success: function (response) {
+                console.log(response);
+                
                 $("#tasktitle").val(response.tasktitle);
                 $("#description").val(response.description);
 
                 $("#task_image").html(
-                    `<img src="storage/images/${response.image}" width="100" class="img-fluid img-thumbnail"/>`
+                    `<img src="/storage/images/${response.image}" width="100" class="img-fluid img-thumbnail"/>`
                 );
                 $("#task_id").val(response.id);
-                $("#image").val(response.image);
+                $("#image").val(`storage/images/${response.image}`);
+                
             },
         });
     });
@@ -145,7 +152,7 @@ $(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "/delete/" + id,
+                    url: "/delete",
                     method: "delete",
                     data: {
                         id: id,
@@ -168,9 +175,9 @@ $(function () {
     $("#showall:checkbox").bind("change", function (e) {
         if ($(this).is(":checked")) {
             fetchTasks();
-            console.log("admin");
+            // console.log("all task");
         } else {
-            console.log("user");
+            // console.log("user task");
             fetchTasks();
         }
     });
@@ -178,104 +185,158 @@ $(function () {
     // fetch all tasks ajax request
     fetchTasks();
 
-    // function fetchTasks() {
-    //     //   console.log("hell0");
-
-    //     $.ajax({
-    //         url: "/fetchall",
-    //         method: "get",
-    //         success: function (response) {
-    //             // console.log(response);
-
-    //             $("#show_all_tasks").html(response);
-    //         },
-    //     });
-    // }
     function fetchTasks() {
+        
+        
+        
         $.ajaxSetup({
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
         });
+
         $.ajax({
             url: "/show-all",
             method: "post",
             data: { check: $('input[name="show"]').prop("checked") },
             success: function (response) {
-                var resultData = response.tasks.data;
-                var bodyData = `<div class="container">
-                <div class="row text-center">`;
-                // $("#show_all_tasks .name").html(response);
-                console.log({
-                    tasks: response.tasks.data,
-                    id: response.username,
+                // console.log(response);
+
+                bodyDataHtml(response);
+
+                $(document).on("click", "#nextBtn", function (event) {
+                    let nextPageUrl = response.tasks.path;
+                    let page = $(this).data("nextpage");
+                    let totalpage = response.tasks.last_page;
+                    // console.log({ page, nextPageUrl, totalpage });
+                    if (totalpage >= page) {
+                        $.post(
+                            `${nextPageUrl}?page=${page}`,
+                            { check: $('input[name="show"]').prop("checked") },
+                            function (result) {
+                                bodyDataHtml(result);
+                            }
+                        );
+                    }
                 });
 
-                $.each(resultData, function (index, task) {
-                    let adminAction = task.user_id !== response.userid;
-
-                    bodyData += `
-                    <div class="col-12 mb-5 card-view" style="box-shadow: 0 3px 10px rgb(0 0 0 / 0.2); ">
-                        <div class="bg-white rounded shadow-sm py-5 px-4 d-flex justify-content-between" id="img-div">
-                            <img src="storage/images/${
-                                task.image
-                            }" alt="" width="150" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm"/>
-                            <div class="text-center">
-                                <h5 class="mb-0">${task.tasktitle}</h5>
-                                <span class="small text-uppercase text-muted">ID: ${
-                                    response.userid
-                                }</span>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-between">
-                        <p class="mt-3" style="text-align: justify; max-width:85%;">${
-                            task.description
-                        }</p>
-                        <div class="d-flex align-items-center px-2">
-                            <a href="#" id="${
-                                task.id
-                            }" class="text-success mx-1 editIcon ${
-                        adminAction ? " disabled" : ""
-                    }" onmouseover="${adminAction} &&    alert('you haven\'t permission')" data-toggle="modal" data-target="#editTaskModal"><i class="fas fa-marker"></i>
-                            </a>
-
-                            <a href="#" id="${
-                                task.id
-                            }" class="text-danger mx-1 deleteIcon ${
-                        adminAction ? " disabled" : ""
-                    }" onmouseover="${adminAction} && alert('you haven\'t permission')">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </div>
-                    </div>
-                    </div>
-                    `;
+                $(document).on("click", "#prevBtn", function (event) {
+                    let prevPageUrl = response.tasks.path;
+                    let page = $(this).data("prevpage");
+                    let totalpage = response.tasks.last_page;
+                    // console.log({ page, prevPageUrl, totalpage });
+                    if (page > 0) {
+                        $.post(
+                            `${prevPageUrl}?page=${page}`,
+                            { check: $('input[name="show"]').prop("checked") },
+                            function (result) {
+                                bodyDataHtml(result);
+                            }
+                        );
+                    }
                 });
-                bodyData += `</div></div>`;
-
-                $("#show_all_tasks").append(bodyData);
             },
         });
     }
     // grid view
 });
+// console.log($("#nextBtn").data("page"));
 
-/// pagiantion
-$(document).ready(function () {
-    $(document).on("click", ".pagination a", function (event) {
-        event.preventDefault();
-        var page = $(this).attr("href").split("page=")[1];
+function bodyDataHtml(response) {
+    // console.log( {activelayout, activeClass});
+   
+    $("#show_all_tasks .container").remove();
+    $(".pagination .container").remove();
 
-        fetch_data(page);
+    var resultData = response.tasks.data;
+
+    var pagiantionData = "";
+
+    pagiantionData += `<div class="container" style="display:flex; margin-top:12px">`;
+    pagiantionData += `<button class="btn btn-sm btn-primary px-2 mx-5" id="prevBtn" data-prevpage="${
+        response.tasks.current_page - 1
+    }">prev </button>`;
+
+    pagiantionData += `<p> ${response.tasks.current_page}</p>`;
+
+    pagiantionData += `<button class="btn btn-sm btn-primary px-2 mx-5" data-nextpage="${
+        response.tasks.current_page + 1
+    }"   id="nextBtn">Next</button>`;
+
+    pagiantionData += `</div>`;
+
+    // task body card
+    var bodyData = `<div class="container">
+    <div class="row text-center">`;
+    console.log({
+        tasks: response.tasks,
+        msg: "fetch task function",
+        url: response.tasks.next_page_url,
     });
 
-    function fetch_data(page) {
-        $.ajax({
-            url: "show-all?page=" + page,
-            success: function (data) {
-                console.log(data.data)
-                $("#show_all_tasks").html(data.data);
-            },
-        });
-    }
-});
+    $.each(resultData, function (index, task) {
+        let adminAction = task.user_id !== response.userid;
+        // console.log({adminAction});
+        
+
+        bodyData += `
+        <div class="col-12 mb-5 card-view" style="box-shadow: 0 3px 10px rgb(0 0 0 / 0.2); ">
+            <div class="bg-white rounded shadow-sm py-5 px-4 d-flex justify-content-between" id="img-div">
+                <img src="storage/images/${
+                    task.image
+                }" alt="" width="150" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm"/>
+                <div class="text-center">
+                    <h5 class="mb-0">${task.tasktitle}</h5>
+                    <span class="small text-uppercase text-muted">ID: ${
+                        task.user_id
+                    }</span>
+                </div>
+            </div>
+            <div class="d-flex justify-between">
+            <p class="mt-3" style="text-align: justify; max-width:85%;">${
+                task.description
+            }</p>
+            <div class="d-flex align-items-center px-2">
+                <a href="#" id="${task.id}" class="text-success mx-1 editIcon ${
+            adminAction ? " disabled" : ""
+        }"  data-toggle="modal" data-target="#editTaskModal"><i class="fas fa-marker"></i>
+                </a>
+                <a href="#" id="${task.id}" class="text-danger mx-1 deleteIcon ${
+                    adminAction ? "disabled" : ""
+                }"><i class="fas fa-trash"></i>
+                </a>
+
+            </div>
+        </div>
+        </div>
+        `;
+    });
+    bodyData += `</div></div>`;
+
+    $("#show_all_tasks").append(bodyData);
+    $(".pagination").append(pagiantionData);
+    $(`.${activeClass}`).click();
+}
+
+/// pagiantion
+// $(document).ready(function () {
+//     $(document).on("click", ".pagination a", function (event) {
+//         event.preventDefault();
+//         var page = $(this).attr("href").split("page=")[1];
+
+//         fetch_data(page);
+//     });
+
+//     function fetch_data(page) {
+//         $.ajax({
+//             url: "show-all?page=" + page,
+//             success: function (response) {
+//                 console.log({
+//                     tasks: response.tasks.data,
+//                     msg: "pagination function",
+//                 });
+//                 $("#show_all_tasks").html(response.tasks.data);
+//             },
+//         });
+//     }
+// });
