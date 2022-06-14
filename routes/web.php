@@ -28,7 +28,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/edit', [TaskController::class, 'edit'])->name('edit');
     Route::post('/update', [TaskController::class, 'update'])->name('update');
     Route::get('/fetchall', [TaskController::class, 'fetchAll'])->name('fetchAll');
-    Route::get('/show-all', [TaskController::class, 'showAll'])->name('showAll');
+    // Route::get('/show-all', [TaskController::class, 'showAll'])->name('showAll');
+    Route::post('/show-all', [TaskController::class, 'showAll'])->name('showAll');
     Route::get("/pagination/fetch_data", [TaskController::class, "showAll"]);
     
 });

@@ -26,8 +26,18 @@ class TaskController extends Controller
 	public function showAll(Request $request)
 	{
 	
+		// dd($request->all());
 		
-		$tasks = Task::paginate(2);
+		if($request->check){
+			$tasks = Task::paginate(2);
+			// return response()->json($tasks);
+		}else{
+			$tasks = Auth::user()
+			->tasks()
+			->orderByDesc('created_at')
+			->paginate(2);
+			// return response()->json($tasks);
+		}
 
 		if ($request->ajax()) {
 			return view("task.layout", compact("tasks"))->render();

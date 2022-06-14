@@ -199,11 +199,17 @@ $(function () {
     function admin() {
         //   console.log("hell0");
         // $("#DataTables_Table_0_info").hide();
+        $.ajaxSetup({
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+        });
         $.ajax({
             url: "/show-all",
-            method: "get",
+            method: "post",
+            data: {check:$('input[name="show"]').prop('checked')},
             success: function (response) {
-                // console.log(response);
+                console.log(response);
 
                 $("#show_all_tasks").html(response);
                
